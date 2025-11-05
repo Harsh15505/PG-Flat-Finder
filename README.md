@@ -204,38 +204,6 @@ pg-finder/
 - Clear browser cache and cookies
 - Verify PHP sessions are enabled
 
-## 📚 Documentation
-
-- `QUICK_START.md` - Quick setup guide
-- `SETUP_GUIDE.md` - Detailed installation instructions
-- `PERFORMANCE_FIX_SUMMARY.md` - Performance optimizations
-- `IMAGE_LOADING_FIX.md` - Image loading troubleshooting
-
-## 🤝 Contributing
-
-This is an educational project. Feel free to:
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - free for educational and personal use.
-
-## 👨‍💻 Author
-
-Developed as a college project demonstrating full-stack web development skills.
-
-## 🙏 Acknowledgments
-
-- Sample images from [Unsplash](https://unsplash.com)
-- Icons and emojis from system defaults
-- Inspired by real-world PG/flat finder platforms
-
 ---
 
 **⭐ Star this repo if you find it helpful!**
-
-**Made with ❤️ for Educational Purposes**
