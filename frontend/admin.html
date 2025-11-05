@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - PG/Flat Finder</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header>
+        <nav>
+            <a href="index.html" class="logo">
+                <span>🏠</span> PG<span>Finder</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="admin.html">Admin</a></li>
+                <li><a href="#" onclick="logout()" class="btn btn-danger btn-sm">Logout</a></li>
+            </ul>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+        </nav>
+    </header>
+
+    <!-- Admin Panel -->
+    <div class="container">
+        <h1 class="mb-3">Admin Panel</h1>
+        
+        <!-- Statistics -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <div class="stat-value" id="totalListings">0</div>
+                <div class="stat-label">Total Listings</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <div class="stat-value" id="totalInquiries">0</div>
+                <div class="stat-label">Total Inquiries</div>
+            </div>
+        </div>
+        
+        <!-- Users Table -->
+        <div style="background:white; padding:2rem; border-radius:8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top:2rem;">
+            <h2 class="mb-3">Manage Users</h2>
+            <div id="usersTable">
+                <p class="text-center">Loading...</p>
+            </div>
+        </div>
+        
+        <!-- Listings Table -->
+        <div style="background:white; padding:2rem; border-radius:8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top:2rem;">
+            <h2 class="mb-3">Manage Listings</h2>
+            <div id="listingsTable">
+                <p class="text-center">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 PG/Flat Finder. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Admin-specific functions
+        async function loadAdminData() {
+            const authenticated = await checkAuth();
+            if (!authenticated || currentUser.role !== 'admin') {
+                showAlert('Access denied. Admin account required.', 'error');
+                setTimeout(() => window.location.href = 'index.html', 2000);
+                return;
+            }
+            
+            await loadStats();
+            await loadUsers();
+            await loadAllListings();
+        }
+        
+        async function loadStats() {
+            const response = await apiRequest('admin.php?action=stats');
+            if (response.success && response.data) {
+                const stats = response.data;
+                document.getElementById('totalListings').textContent = stats.total_listings;
+                document.getElementById('totalInquiries').textContent = stats.total_inquiries;
+                
+                let totalUsers = 0;
+                stats.users_by_role.forEach(role => {
+                    totalUsers += parseInt(role.count);
+                });
+                document.getElementById('totalUsers').textContent = totalUsers;
+            }
+        }
+        
+        async function loadUsers() {
+            const response = await apiRequest('admin.php?action=users');
+            if (response.success && response.data) {
+                displayUsers(response.data);
+            }
+        }
+        
+        function displayUsers(users) {
+            const container = document.getElementById('usersTable');
+            container.innerHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Role</th>
+                                <th>Listings</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${users.map(user => `
+                                <tr>
+                                    <td>${user.id}</td>
+                                    <td>${sanitize(user.name)}</td>
+                                    <td>${sanitize(user.email)}</td>
+                                    <td>${sanitize(user.phone)}</td>
+                                    <td><span class="badge badge-primary">${user.role}</span></td>
+                                    <td>${user.listing_count}</td>
+                                    <td><span class="badge ${user.is_active ? 'badge-success' : 'badge-danger'}">${user.is_active ? 'Active' : 'Inactive'}</span></td>
+                                    <td>${formatDate(user.created_at)}</td>
+                                    <td>
+                                        <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-secondary'}" onclick="toggleUser(${user.id})">
+                                            ${user.is_active ? 'Deactivate' : 'Activate'}
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        async function loadAllListings() {
+            const response = await apiRequest('admin.php?action=listings');
+            if (response.success && response.data) {
+                displayAdminListings(response.data);
+            }
+        }
+        
+        function displayAdminListings(listings) {
+            const container = document.getElementById('listingsTable');
+            container.innerHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Rent</th>
+                                <th>City</th>
+                                <th>Landlord</th>
+                                <th>Views</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${listings.map(listing => {
+                                // Handle both web URLs and local paths
+                                const imageSrc = listing.thumbnail 
+                                    ? (listing.thumbnail.startsWith('http') ? listing.thumbnail : '../' + listing.thumbnail)
+                                    : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400';
+                                
+                                return `
+                                <tr>
+                                    <td>${listing.id}</td>
+                                    <td><img src="${imageSrc}" alt="Listing" style="width:50px;height:50px;object-fit:cover;border-radius:4px;" onerror="this.src='https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400'"></td>
+                                    <td>${sanitize(listing.title)}</td>
+                                    <td>${formatCurrency(listing.rent)}</td>
+                                    <td>${sanitize(listing.city)}</td>
+                                    <td>${sanitize(listing.landlord_name)}</td>
+                                    <td>${listing.views}</td>
+                                    <td><span class="badge ${listing.is_active ? 'badge-success' : 'badge-danger'}">${listing.is_active ? 'Active' : 'Inactive'}</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="viewListing(${listing.id})">View</button>
+                                        <button class="btn btn-sm ${listing.is_active ? 'btn-danger' : 'btn-secondary'}" onclick="toggleListing(${listing.id})">
+                                            ${listing.is_active ? 'Deactivate' : 'Activate'}
+                                        </button>
+                                    </td>
+                                </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        async function toggleUser(userId) {
+            if (!confirm('Are you sure you want to toggle this user status?')) return;
+            
+            showLoading();
+            const response = await apiRequest(`admin.php?action=toggle-user&user_id=${userId}`);
+            hideLoading();
+            
+            if (response.success) {
+                showAlert(response.message, 'success');
+                loadUsers();
+            } else {
+                showAlert(response.message, 'error');
+            }
+        }
+        
+        async function toggleListing(listingId) {
+            if (!confirm('Are you sure you want to toggle this listing status?')) return;
+            
+            showLoading();
+            const response = await apiRequest(`admin.php?action=toggle-listing&listing_id=${listingId}`);
+            hideLoading();
+            
+            if (response.success) {
+                showAlert(response.message, 'success');
+                loadAllListings();
+            } else {
+                showAlert(response.message, 'error');
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadAdminData);
+    </script>
+</body>
+</html>

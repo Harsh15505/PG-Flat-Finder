@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Listings - PG/Flat Finder</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header>
+        <nav>
+            <a href="index.html" class="logo">
+                <span>🏠</span> PG<span>Finder</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="search.html">Search</a></li>
+                <li><a href="login.html" class="btn btn-primary btn-sm">Login</a></li>
+                <li><a href="register.html" class="btn btn-outline btn-sm">Register</a></li>
+            </ul>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+        </nav>
+    </header>
+
+    <!-- Search Section -->
+    <div class="container">
+        <h1 class="text-center mt-3 mb-2">Search PG & Flats</h1>
+        
+        <div class="search-section">
+            <form class="search-form" onsubmit="handleSearchForm(event)">
+                <div class="form-group">
+                    <label>Search</label>
+                    <input type="text" name="search" placeholder="Search by title, description...">
+                </div>
+                
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city" placeholder="Enter city name">
+                </div>
+                
+                <div class="form-group">
+                    <label>Min Rent</label>
+                    <input type="number" name="min_rent" placeholder="₹ 0" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label>Max Rent</label>
+                    <input type="number" name="max_rent" placeholder="₹ 50000" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label>Gender Preference</label>
+                    <select name="gender">
+                        <option value="">Any</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="any">Any</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="display:flex; align-items:end; padding-top:0.5rem;">
+                    <button type="submit" class="btn btn-primary btn-block">Search</button>
+                </div>
+            </form>
+            
+            <div class="search-filters">
+                <label class="checkbox-group">
+                    <input type="checkbox" name="furnished" id="furnished">
+                    <span>Furnished Only</span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Results -->
+        <div class="mt-4">
+            <h2 class="mb-3">Search Results</h2>
+            <div class="listings-grid" id="listingsGrid">
+                <p class="text-center">Loading...</p>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        <div id="pagination" class="text-center mt-4"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 PG/Flat Finder. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/image-preloader.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

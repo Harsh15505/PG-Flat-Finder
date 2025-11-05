@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PG/Flat Finder</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header>
+        <nav>
+            <a href="index.html" class="logo">
+                <span>🏠</span> PG<span>Finder</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="search.html">Search</a></li>
+                <li><a href="login.html" class="btn btn-primary btn-sm">Login</a></li>
+            </ul>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+        </nav>
+    </header>
+
+    <!-- Dashboard -->
+    <div class="container">
+        <h1 class="mb-3">My Dashboard</h1>
+        
+        <div class="dashboard">
+            <!-- Sidebar -->
+            <div class="dashboard-sidebar">
+                <ul class="sidebar-menu">
+                    <li><a href="#favorites" class="active">My Favorites</a></li>
+                    <li><a href="#inquiries">My Inquiries</a></li>
+                    <li><a href="search.html">Search Listings</a></li>
+                    <li><a href="#" onclick="logout()">Logout</a></li>
+                </ul>
+            </div>
+            
+            <!-- Content -->
+            <div class="dashboard-content">
+                <!-- Tenant Dashboard -->
+                <div id="tenantDashboard">
+                    <section id="favorites">
+                        <h2 class="mb-3">My Favorite Listings</h2>
+                        <div class="listings-grid" id="favoritesList">
+                            <p class="text-center">Loading...</p>
+                        </div>
+                    </section>
+                    
+                    <section id="inquiries" class="mt-4">
+                        <h2 class="mb-3">My Inquiries</h2>
+                        <div id="inquiriesList">
+                            <p class="text-center">Loading...</p>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- Landlord Dashboard -->
+                <div id="landlordDashboard" class="d-none">
+                    <section id="myListings">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+                            <h2>My Listings</h2>
+                            <a href="landlord.html" class="btn btn-primary">Add New Listing</a>
+                        </div>
+                        <div id="myListings">
+                            <p class="text-center">Loading...</p>
+                        </div>
+                    </section>
+                    
+                    <section id="inquiries" class="mt-4">
+                        <h2 class="mb-3">Received Inquiries</h2>
+                        <div id="inquiriesList">
+                            <p class="text-center">Loading...</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 PG/Flat Finder. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Show appropriate dashboard based on user role
+        document.addEventListener('DOMContentLoaded', async () => {
+            const authenticated = await checkAuth();
+            if (authenticated && currentUser) {
+                if (currentUser.role === 'landlord') {
+                    document.getElementById('tenantDashboard').classList.add('d-none');
+                    document.getElementById('landlordDashboard').classList.remove('d-none');
+                }
+                // Load dashboard data after showing correct section
+                await loadDashboard();
+            }
+        });
+    </script>
+</body>
+</html>

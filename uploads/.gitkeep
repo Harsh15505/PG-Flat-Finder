@@ -1,0 +1,12 @@
+# Placeholder file for uploads directory
+# This file ensures the uploads directory is created and tracked by version control
+
+This directory will store user-uploaded images for property listings.
+
+## Important:
+- Make sure this directory has write permissions
+- Windows: Properties → Security → Full Control
+- Linux/Mac: chmod 755 uploads/
+
+Maximum file size: 5MB per image
+Allowed formats: JPG, JPEG, PNG, WebP

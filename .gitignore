@@ -1,0 +1,38 @@
+# Uploads folder (user generated content)
+uploads/*
+!uploads/.gitkeep
+
+# Logs
+*.log
+error.log
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS Files
+Thumbs.db
+desktop.ini
+
+# PHP
+*.cache
+
+# Temporary files
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Environment files (if you add them later)
+.env
+.env.local
+
+# Generated password file
+generate_passwords.php
