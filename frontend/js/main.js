@@ -161,15 +161,23 @@ function updateNavigation() {
     if (!navLinks) return;
     
     if (isAuthenticated && currentUser) {
-        navLinks.innerHTML = `
-            <li><a href="index.html">Home</a></li>
-            <li><a href="search.html">Search</a></li>
-            ${currentUser.role === 'landlord' ? '<li><a href="landlord.html">My Listings</a></li>' : ''}
-            ${currentUser.role === 'admin' ? '<li><a href="admin.html">Admin</a></li>' : ''}
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><span class="text-muted">Hi, ${sanitize(currentUser.name)}</span></li>
-            <li><button class="btn btn-sm btn-danger" onclick="logout()">Logout</button></li>
-        `;
+        // Admin gets only Admin Panel and Logout
+        if (currentUser.role === 'admin') {
+            navLinks.innerHTML = `
+                <li><a href="admin.html">Admin Panel</a></li>
+                <li><span class="text-muted">Hi, ${sanitize(currentUser.name)}</span></li>
+                <li><button class="btn btn-sm btn-danger" onclick="logout()">Logout</button></li>
+            `;
+        } else {
+            navLinks.innerHTML = `
+                <li><a href="index.html">Home</a></li>
+                <li><a href="search.html">Search</a></li>
+                ${currentUser.role === 'landlord' ? '<li><a href="landlord.html">My Listings</a></li>' : ''}
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><span class="text-muted">Hi, ${sanitize(currentUser.name)}</span></li>
+                <li><button class="btn btn-sm btn-danger" onclick="logout()">Logout</button></li>
+            `;
+        }
     } else {
         navLinks.innerHTML = `
             <li><a href="index.html">Home</a></li>
@@ -239,7 +247,15 @@ async function handleRegister(event) {
     if (response.success) {
         showAlert('Registration successful! Redirecting...', 'success');
         setTimeout(() => {
-            window.location.href = 'dashboard.html';
+            // Check user role and redirect accordingly
+            const user = response.data || response.user;
+            if (user && user.role === 'admin') {
+                window.location.href = 'admin.html';
+            } else if (user && user.role === 'landlord') {
+                window.location.href = 'landlord.html';
+            } else {
+                window.location.href = 'dashboard.html';
+            }
         }, 1500);
     } else {
         showAlert(response.message, 'error');
@@ -282,7 +298,15 @@ async function handleLogin(event) {
     if (response.success) {
         showAlert('Login successful! Redirecting...', 'success');
         setTimeout(() => {
-            window.location.href = 'dashboard.html';
+            // Check user role and redirect accordingly
+            const user = response.data || response.user;
+            if (user && user.role === 'admin') {
+                window.location.href = 'admin.html';
+            } else if (user && user.role === 'landlord') {
+                window.location.href = 'landlord.html';
+            } else {
+                window.location.href = 'dashboard.html';
+            }
         }, 1500);
     } else {
         showAlert(response.message, 'error');
@@ -983,7 +1007,7 @@ async function loadInquiries() {
         displayInquiries(response.data);
     } else {
         console.error('Failed to load inquiries:', response.message);
-        const container = document.getElementById('inquiriesList');
+        const container = document.getElementById('landlordInquiriesList') || document.getElementById('inquiriesList');
         if (container) {
             container.innerHTML = `<p class="text-center text-muted">${response.message || 'Failed to load inquiries'}</p>`;
         }
@@ -994,8 +1018,12 @@ async function loadInquiries() {
  * Display inquiries
  */
 function displayInquiries(inquiries) {
-    const container = document.getElementById('inquiriesList');
-    if (!container) return;
+    // Check for both landlord and regular inquiries container
+    const container = document.getElementById('landlordInquiriesList') || document.getElementById('inquiriesList');
+    if (!container) {
+        console.error('Inquiries container not found');
+        return;
+    }
     
     if (!inquiries || inquiries.length === 0) {
         container.innerHTML = '<p class="text-center text-muted">No inquiries received yet</p>';
@@ -1086,6 +1114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setTimeout(() => window.location.href = 'index.html', 2000);
             } else {
                 loadMyListings();
+                loadInquiries(); // Load inquiries for landlord
             }
             break;
     }
